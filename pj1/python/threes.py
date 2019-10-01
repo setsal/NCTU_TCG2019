@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
 """
-Framework for 2048 & 2048-like Games (Python 3)
+Framework for threes  Games
+Modified from  Hung Guei (moporgic) 2048 & 2048-like framework
 
-Author: Hung Guei (moporgic)
-        Computer Games and Intelligence (CGI) Lab, NCTU, Taiwan
-        http://www.aigames.nctu.edu.tw
+Author: setsal Lan (setsal)
 """
 
 from board import board
@@ -53,16 +52,24 @@ if __name__ == '__main__':
     
     play = player(play_args)
     evil = rndenv(evil_args)
-    
+ 
     while not stat.is_finished():
         play.open_episode("~:" + evil.name())
         evil.open_episode(play.name() + ":~")
-        
+        play.recoverOp()
+        evil.recoverBag()
         stat.open_episode(play.name() + ":" + evil.name())
         game = stat.back()
         while True:
+            print(game.state())
+            print("Round end!")
+            print('')
+            if game.step() == 9:
+                    print("======= GAME start! ======= ")
+                    print('')            
+            print('[' + str(game.step()) + '] ')
             who = game.take_turns(play, evil)
-            move = who.take_action(game.state())
+            move =  who.take_action(game.state())
             if not game.apply_action(move) or who.check_for_win(game.state()):
                 break
         win = game.last_turns(play, evil)

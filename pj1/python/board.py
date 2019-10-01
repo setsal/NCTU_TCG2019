@@ -10,6 +10,7 @@ Author: Hung Guei (moporgic)
 
 class board:
     """ simple implementation of 2048 puzzle """
+    threes_seq = [ 0, 1, 2, 3, 6, 12, 24, 48, 96, 192, 384, 768, 1536, 3072, 6144]
     
     def __init__(self, state = None):
         self.state = state[:] if state is not None else [0] * 16
@@ -29,7 +30,7 @@ class board:
         """
         if pos >= 16 or pos < 0:
             return -1
-        if tile != 1 and tile != 2:
+        if tile != 1 and tile != 2 and tile != 3:
             return -1
         self.state[pos] = tile
         return 0
@@ -52,15 +53,41 @@ class board:
     def slide_left(self):
         move, score = [], 0
         for row in [self.state[r:r + 4] for r in range(0, 16, 4)]:
-            buf = sorted(row, key = lambda t: not t) + [0]
-            while buf[0]:
-                if buf[0] == buf[1]:
-                    buf = buf[1:] + [0]
-                    buf[0] += 1
-                    score += 1 << buf[0]
-                move += [buf[0]]
-                buf = buf[1:]
-            move += buf[1:]
+            if row[0] == 0:
+                # Do nothing, just shift
+                row = row[1:] + [0]
+            elif row[0] == row[1] and row[0] != 1 and row[0] != 2:
+                # normal add
+                row[0] = row[0] + 1
+                row[1:] = row[2:] + [0]
+            elif row[0]+row[1] == 3 and row[1] != 0:
+                # Do 1+2 = 3
+                row[0] = 3
+                row[1:] = row[2:] + [0]
+            else:
+                # row[0]!=row[1], check second move
+                if row[1] == 0:
+                    # Do nothing, just shift
+                    row[1:] = row[2:] + [0]
+                elif row[1] == row[2] and row[1] != 1 and row[1] != 2:
+                    row[1] = row[1] + 1
+                    row[2:] = row[3:] + [0]
+                elif row[1]+row[2] == 3 and row[2] != 0:
+                    # Do 1+2 = 3
+                    row[1] = 3
+                    row[2:] = row[3:] + [0]
+                else:
+                    if row[2] == 0:
+                        # Do nothing, just shift
+                        row[2:] = row[3:] + [0]
+                    elif row[2] == row[3] and row[2] != 1 and row[2] != 2:
+                        row[2] = row[2] + 1
+                        row[3:] = row[4:] + [0]
+                    elif row[2]+row[3] == 3 and row[3] != 0:
+                        # Do 1+2 = 3
+                        row[2] = 3
+                        row[3:] = row[4:] + [0]
+            move += row
         if move != self.state:
             self.state = move
             return score
@@ -127,9 +154,10 @@ class board:
         return
         
     def __str__(self):
+        # NEED judege
         state = '+' + '-' * 24 + '+\n'
         for row in [self.state[r:r + 4] for r in range(0, 16, 4)]:
-            state += ('|' + ''.join('{0:6d}'.format((1 << t) & -2) for t in row) + '|\n')
+            state += ('|' + ''.join('{0:6d}'.format(self.threes_seq[int(t)]) for t in row) + '|\n')
         state += '+' + '-' * 24 + '+'
         return state
     
@@ -138,6 +166,14 @@ if __name__ == '__main__':
     print('2048 Demo: board.py\n')
     
     state = board()
-    state[10] = 10
+    state[0] = 2
+    state[1] = 4
+    state[2] = 2
+    state[3] = 1
+    # state[4] = 1
+    # state[5] = 1
+    # state[14] = 5
     print(state)
-    
+    state.slide_left()
+    # state[10] = 10
+    print(state)

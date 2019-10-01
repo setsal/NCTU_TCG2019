@@ -12,6 +12,8 @@ from board import board
 from action import action
 import random
 
+global operation
+operation = -1
 
 class agent:
     """ base agent """
@@ -57,6 +59,8 @@ class random_agent(agent):
     def __init__(self, options = ""):
         super().__init__(options)
         seed = self.property("seed")
+        global operation
+        operation = -1
         if seed is not None:
             random.seed(int(seed))
         self.rstate = random.getstate()
@@ -82,18 +86,47 @@ class rndenv(random_agent):
     2-tile: 90%
     4-tile: 10%
     """
+    threes_bag = [1, 2, 3]
     
     def __init__(self, options = ""):
         super().__init__("name=random role=environment " + options)
         return
-    
+
+    def recoverBag(self):
+        self.threes_bag = [1,2,3]
+        return
+
     def take_action(self, state):
-        empty = [pos for pos, tile in enumerate(state.state) if not tile]
+        global operation
+        # print('Get player operation:' + str(operation) ) 
+        if operation == 0:
+            #UP
+            empty = [pos for pos, tile in enumerate(state.state) if not tile and pos in [12,13,14,15]]
+        elif operation == 1:
+            #Right
+            empty = [pos for pos, tile in enumerate(state.state) if not tile and pos in [0,4,8,12] ]
+        elif operation == 2:
+            #Down
+            empty = [pos for pos, tile in enumerate(state.state) if not tile and pos in [0,1,2,3] ]
+        elif operation == 3:
+            #Left
+            empty = [pos for pos, tile in enumerate(state.state) if not tile and pos in [3,7,11,15]]
+        else:
+            empty = [pos for pos, tile in enumerate(state.state) if not tile]
+        
         if empty:
             pos = self.choice(empty)
-            tile = self.choice([1] * 9 + [2])
+            print("remain bag" + str(self.threes_bag ))
+            """Change to bag"""
+            if not self.threes_bag:
+                self.threes_bag = [1,2,3]
+            tile = self.choice(self.threes_bag)
+            self.threes_bag.remove(tile)
+            # print("Env put: " + str(tile) + ", in postion: " + str(pos))
+            """ Change to bag """
+            #tile = self.choice([1] * 9 + [2])
             return action.place(pos, tile)
-        else:
+        else: 
             return action()
     
     
@@ -102,15 +135,24 @@ class player(random_agent):
     dummy player
     select a legal action randomly
     """
+    res = [ "#U", "#R", "#D", "#L", "#?" ]
     
     def __init__(self, options = ""):
         super().__init__("name=dummy role=player " + options)
         return
     
+    def recoverOp(self):
+        global operation
+        operation = -1
+        return
+
     def take_action(self, state):
         legal = [op for op in range(4) if board(state).slide(op) != -1]
         if legal:
             op = self.choice(legal)
+            # print("Player do: " + str(self.res[op]))
+            global operation
+            operation = op
             return action.slide(op)
         else:
             return action()

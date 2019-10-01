@@ -71,6 +71,7 @@ class statistic:
             pdu += ep.time(action.slide.type)
             edu += ep.time(action.place.type)
         
+        print(edu)
         print("%d\t" "avg = %d, max = %d, ops = %d (%d|%d)" % (self.count, ssc / blk, msc, sop * 1000 / sdu, pop * 1000 / pdu, eop * 1000 / edu))
         
         if not tstat:
