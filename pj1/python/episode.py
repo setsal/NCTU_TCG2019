@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
 """
-Basic framework for developing 2048 programs in Python
+Framework for threes  Games
+Modified from  Hung Guei (moporgic) 2048 & 2048-like framework
 
-Author: Hung Guei (moporgic)
-        Computer Games and Intelligence (CGI) Lab, NCTU, Taiwan
-        http://www.aigames.nctu.edu.tw
+Author: setsal Lan (setsal)
 """
 
 from board import board
@@ -46,6 +45,7 @@ class episode:
         return True
     
     def take_turns(self, play, evil):
+        """ First nine steps is from rndenv evil """
         self.ep_time = self.millisec()
         if self.step() < 8:
             return evil

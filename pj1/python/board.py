@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 
 """
-Basic framework for developing 2048 programs in Python
+Framework for threes  Games
+Modified from  Hung Guei (moporgic) 2048 & 2048-like framework
 
-Author: Hung Guei (moporgic)
-        Computer Games and Intelligence (CGI) Lab, NCTU, Taiwan
-        http://www.aigames.nctu.edu.tw
+Author: setsal Lan (setsal)
 """
 
 class board:
-    """ simple implementation of 2048 puzzle """
+    """ simple implementation of threes puzzle """
     threes_seq = [ 0, 1, 2, 3, 6, 12, 24, 48, 96, 192, 384, 768, 1536, 3072, 6144]
     
     def __init__(self, state = None):
@@ -163,7 +162,7 @@ class board:
     
     
 if __name__ == '__main__':
-    print('2048 Demo: board.py\n')
+    print('Threes Demo: board.py\n')
     
     state = board()
     state[0] = 2

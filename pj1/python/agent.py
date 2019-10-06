@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 
 """
-Basic framework for developing 2048 programs in Python
+Framework for threes  Games
+Modified from  Hung Guei (moporgic) 2048 & 2048-like framework
 
-Author: Hung Guei (moporgic)
-        Computer Games and Intelligence (CGI) Lab, NCTU, Taiwan
-        http://www.aigames.nctu.edu.tw
+Author: setsal Lan (setsal)
 """
 
 from board import board
 from action import action
 import random
+
 
 global operation
 operation = -1
@@ -82,9 +82,7 @@ class random_agent(agent):
 class rndenv(random_agent):
     """
     random environment
-    add a new random tile to an empty cell
-    2-tile: 90%
-    4-tile: 10%
+    choic a random tile from threes bag
     """
     threes_bag = [1, 2, 3]
     
@@ -97,6 +95,7 @@ class rndenv(random_agent):
         return
 
     def take_action(self, state):
+        """ Get the last player operation """
         global operation
         # print('Get player operation:' + str(operation) ) 
         if operation == 0:
@@ -116,15 +115,15 @@ class rndenv(random_agent):
         
         if empty:
             pos = self.choice(empty)
-            print("remain bag" + str(self.threes_bag ))
-            """Change to bag"""
+            # print("remain bag" + str(self.threes_bag ))
+
+            """ Change to bag selection """
             if not self.threes_bag:
                 self.threes_bag = [1,2,3]
             tile = self.choice(self.threes_bag)
             self.threes_bag.remove(tile)
             # print("Env put: " + str(tile) + ", in postion: " + str(pos))
-            """ Change to bag """
-            #tile = self.choice([1] * 9 + [2])
+            
             return action.place(pos, tile)
         else: 
             return action()
@@ -149,10 +148,20 @@ class player(random_agent):
     def take_action(self, state):
         legal = [op for op in range(4) if board(state).slide(op) != -1]
         if legal:
-            op = self.choice(legal)
+            """   Simple choice strategy ---> Prefer Up and Right  """
+            if 0 in legal:
+                if 1 in legal:
+                    op = self.choice([0,1])
+                else:
+                    op = 0
+            else:
+                op = self.choice(legal)
             # print("Player do: " + str(self.res[op]))
+
+            """ remember the current operation for current player doing """
             global operation
             operation = op
+
             return action.slide(op)
         else:
             return action()
