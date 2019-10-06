@@ -154,6 +154,8 @@ class player(random_agent):
                     op = self.choice([0,1])
                 else:
                     op = 0
+            elif 1 in legal:
+                op = 1
             else:
                 op = self.choice(legal)
             # print("Player do: " + str(self.res[op]))

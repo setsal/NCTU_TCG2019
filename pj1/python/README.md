@@ -19,5 +19,5 @@ Improve - Create some player strategy
 
 Result screenshot in TA judge system
 ===
-![](https://i.imgur.com/au6LCun.png)
+![](https://i.imgur.com/Nxg9gRu.png)
 
