@@ -17,7 +17,7 @@ Improve - Create some player strategy
 
 - Simple strategy to let player agent prefer to move up and right, especially up
 
-### Result screenshot in TA judge system
-
+Result screenshot in TA judge system
+===
 ![](https://i.imgur.com/au6LCun.png)
 
