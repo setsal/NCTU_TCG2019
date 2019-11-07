@@ -9,11 +9,14 @@ Author: setsal Lan (setsal)
 
 from board import board
 from action import action
-import random
-
-
 global operation
 operation = -1
+from weight import weight
+from array import array
+import random
+import sys
+
+
 
 class agent:
     """ base agent """
@@ -24,6 +27,12 @@ class agent:
         for option in options.split():
             data = option.split("=", 1) + [True]
             self.info[data[0]] = data[1]
+        return
+    
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exc_type, exc_value, traceback):
         return
     
     def open_episode(self, flag = ""):
@@ -63,26 +72,86 @@ class random_agent(agent):
         operation = -1
         if seed is not None:
             random.seed(int(seed))
-        self.rstate = random.getstate()
+        # self.rstate = random.getstate()
         return
     
     def choice(self, seq):
-        random.setstate(self.rstate)
+        # random.setstate(self.rstate)
         target = random.choice(seq)
-        self.rstate = random.getstate()
+        # self.rstate = random.getstate()
         return target
     
     def shuffle(self, seq):
-        random.setstate(self.rstate)
+        # random.setstate(self.rstate)
         random.shuffle(seq)
-        self.rstate = random.getstate()
+        # self.rstate = random.getstate()
+        # if seed is not None:
+        #     random.seed(int(seed))
+        return
+    
+    
+
+class weight_agent(agent):
+    """ base agent for agents with weight tables """
+    
+    def __init__(self, options = ""):
+        super().__init__(options)
+        self.net = []
+        init = self.property("init")
+        if init is not None:
+            self.init_weights(init)
+        load = self.property("load")
+        if load is not None:
+            self.load_weights(load)
+        return
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        save = self.property("save")
+        if save is not None:
+            self.save_weights(save)
+        return
+    
+    def init_weights(self, info):
+#         self.net += [weight(65536)]
+#         self.net += [weight(65536)]
+        return
+    
+    def load_weights(self, path):
+        input = open(path, 'rb')
+        size = array('L')
+        size.fromfile(input, 1)
+        size = size[0]
+        for i in range(size):
+            self.net += [weight()]
+            self.net[-1].load(input)
+        return
+    
+    def save_weights(self, path):
+        output = open(path, 'wb')
+        array('L', [len(self.net)]).tofile(output)
+        for w in self.net:
+            w.save(output)
+        return
+
+
+class learning_agent(agent):
+    """ base agent for agents with a learning rate """
+    
+    def __init__(self, options = ""):
+        super().__init__(options)
+        self.alpha = 0.1
+        alpha = self.property("alpha")
+        if alpha is not None:
+            self.alpha = float(alpha)
         return
 
 
 class rndenv(random_agent):
     """
     random environment
-    choic a random tile from threes bag
+    add a new random tile to an empty cell
+    2-tile: 90%
+    4-tile: 10%
     """
     threes_bag = [1, 2, 3]
     
@@ -125,7 +194,7 @@ class rndenv(random_agent):
             # print("Env put: " + str(tile) + ", in postion: " + str(pos))
             
             return action.place(pos, tile)
-        else: 
+        else:     
             return action()
     
     
@@ -134,7 +203,7 @@ class player(random_agent):
     dummy player
     select a legal action randomly
     """
-    res = [ "#U", "#R", "#D", "#L", "#?" ]
+    res = [ "#U", "#R", "#D", "#L", "#?" ]    
     
     def __init__(self, options = ""):
         super().__init__("name=dummy role=player " + options)
