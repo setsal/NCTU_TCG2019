@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Framework for threes  Games
+Framework for threes Games
 Modified from  Hung Guei (moporgic) 2048 & 2048-like framework
 
 Author: setsal Lan (setsal)
@@ -112,10 +112,16 @@ class weight_agent(agent):
         return
     
     def init_weights(self, info):
-#         self.net += [weight(65536)]
-#         self.net += [weight(65536)]
+        self.net += [weight(65536)]
+        self.net += [weight(65536)]
+        self.net += [weight(65536)]
+        self.net += [weight(65536)]
+        self.net += [weight(65536)]
+        self.net += [weight(65536)]
+        self.net += [weight(65536)]
+        self.net += [weight(65536)]
         return
-    
+
     def load_weights(self, path):
         input = open(path, 'rb')
         size = array('L')
@@ -134,7 +140,7 @@ class weight_agent(agent):
         return
 
 
-class learning_agent(agent):
+class learning_agent(weight_agent):
     """ base agent for agents with a learning rate """
     
     def __init__(self, options = ""):
@@ -144,7 +150,27 @@ class learning_agent(agent):
         if alpha is not None:
             self.alpha = float(alpha)
         return
+    
+    """ calculate function """
+    def encode(self, state, array):
+        return
 
+    """ board state"""
+    def evaluate(self, state):
+        v = 0
+        v += self.net[0][self.encode(state, [0,1,2,3])]
+        v += self.net[1][self.encode(state, [4,5,6,7])]
+        v += self.net[2][self.encode(state, [8,9,10,11])]
+        v += self.net[3][self.encode(state, [12,13,14,15])]
+        v += self.net[4][self.encode(state, [0,4,8,12])]
+        v += self.net[5][self.encode(state, [1,5,9,13])]
+        v += self.net[6][self.encode(state, [2,6,10,14])]
+        v += self.net[7][self.encode(state, [3,7,11,15])]
+        return v        
+
+    """ board state,  float target"""
+    def update(self):
+        return        
 
 class rndenv(random_agent):
     """
