@@ -49,6 +49,9 @@ class board:
             return self.slide_left()
         return -1
     
+    def getScore(self, value):
+        return 3 ** ( value - 2 )
+
     def slide_left(self):
         move, score = [], 0
         for row in [self.state[r:r + 4] for r in range(0, 16, 4)]:
@@ -59,10 +62,12 @@ class board:
                 # normal add
                 row[0] = row[0] + 1
                 row[1:] = row[2:] + [0]
+                score += 3 * (1 << (row[0] - 2))
             elif row[0]+row[1] == 3 and row[1] != 0:
                 # Do 1+2 = 3
                 row[0] = 3
                 row[1:] = row[2:] + [0]
+                score += 3 
             else:
                 # row[0]!=row[1], check second move
                 if row[1] == 0:
@@ -71,10 +76,12 @@ class board:
                 elif row[1] == row[2] and row[1] != 1 and row[1] != 2:
                     row[1] = row[1] + 1
                     row[2:] = row[3:] + [0]
+                    score += 3 * (1 << (row[1] - 2))
                 elif row[1]+row[2] == 3 and row[2] != 0:
                     # Do 1+2 = 3
                     row[1] = 3
                     row[2:] = row[3:] + [0]
+                    score += 3
                 else:
                     if row[2] == 0:
                         # Do nothing, just shift
@@ -82,10 +89,12 @@ class board:
                     elif row[2] == row[3] and row[2] != 1 and row[2] != 2:
                         row[2] = row[2] + 1
                         row[3:] = row[4:] + [0]
+                        score += 3 * (1 << (row[2] - 2))
                     elif row[2]+row[3] == 3 and row[3] != 0:
                         # Do 1+2 = 3
                         row[2] = 3
                         row[3:] = row[4:] + [0]
+                        score += 3
             move += row
         if move != self.state:
             self.state = move

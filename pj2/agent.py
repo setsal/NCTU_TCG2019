@@ -143,6 +143,8 @@ class weight_agent(agent):
 class learning_agent(weight_agent):
     """ base agent for agents with a learning rate """
     
+    res = [ "#U", "#R", "#D", "#L", "#?" ]
+
     def __init__(self, options = ""):
         super().__init__(options)
         self.alpha = 0.1
@@ -208,6 +210,8 @@ class learning_agent(weight_agent):
                 if v > best_value:
                     best_value = v
                     best_action = action.slide(op)
+                    global operation
+                    operation = op
         
         if not self.first:
             if best_value != -10000000:
@@ -215,8 +219,9 @@ class learning_agent(weight_agent):
             else:
                 self.update(self.last_state, 0)
 
-        self.last_state = before
-        self.last_state.slide(best_action)
+
+        self.last_state = board(before)
+        self.last_state.slide(operation)
         self.last_value = self.evaluate(self.last_state)
         self.first = False
 
