@@ -87,18 +87,6 @@ class board:
                         row[2] = 3
                         row[3:] = row[4:] + [0]
             move += row
-        """ merge
-        for row in [self.state[r:r + 4] for r in range(0, 16, 4)]:
-            buf = sorted(row, key = lambda t: not t) + [0]
-            while buf[0]:
-                if buf[0] == buf[1]:
-                    buf = buf[1:] + [0]
-                    buf[0] += 1
-                    score += 1 << buf[0]
-                move += [buf[0]]
-                buf = buf[1:]
-            move += buf[1:]
-        """
         if move != self.state:
             self.state = move
             return score

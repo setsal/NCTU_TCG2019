@@ -13,6 +13,7 @@ from episode import episode
 from statistic import statistic
 from agent import player
 from agent import rndenv
+from agent import learning_agent
 import sys
 
 
@@ -50,22 +51,23 @@ if __name__ == '__main__':
         input.close()
         summary |= stat.is_finished()
     
-    with player(play_args) as play, rndenv(evil_args) as evil:    
+    with learning_agent(play_args) as play, rndenv(evil_args) as evil:    
         while not stat.is_finished():
+            print("In game")
             play.open_episode("~:" + evil.name())
             evil.open_episode(play.name() + ":~")
             play.recoverOp()
-            evil.recoverBag()            
+            evil.recoverBag()
             stat.open_episode(play.name() + ":" + evil.name())
             game = stat.back()
             while True:
-            # print(game.state())
-            # print("Round end!")
-            # print('')
-            # if game.step() == 9:
-            #         print("======= GAME start! ======= ")
-            #         print('')            
-            # print('[' + str(game.step()) + '] ')                
+                print(game.state())
+                print("Round end!")
+                print('')
+                if game.step() == 9:
+                        print("======= GAME start! ======= ")
+                        print('')            
+                print('[' + str(game.step()) + '] ' + ("env" if game.step()%2 == 0 or game.step()<=9 else "player") )                
                 who = game.take_turns(play, evil)
                 move = who.take_action(game.state())
                 if not game.apply_action(move) or who.check_for_win(game.state()):

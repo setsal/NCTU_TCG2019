@@ -146,31 +146,84 @@ class learning_agent(weight_agent):
     def __init__(self, options = ""):
         super().__init__(options)
         self.alpha = 0.1
+        self.last_state = None
+        self.last_value = 0
+        self.first = False
         alpha = self.property("alpha")
         if alpha is not None:
             self.alpha = float(alpha)
         return
     
-    """ calculate function """
-    def encode(self, state, array):
+    def open_episode(self, flag = ""):
+        self.first = True
+
+    def recoverOp(self):
+        global operation
+        operation = -1
         return
+
+    """ calculate function """
+    def encode(self, state, target):
+        return ( state[target[0]] << 0 ) | ( state[target[1]] << 4 ) | ( state[target[2]] << 8 ) | ( state[target[3]] << 12 )
 
     """ board state"""
     def evaluate(self, state):
         v = 0
-        v += self.net[0][self.encode(state, [0,1,2,3])]
-        v += self.net[1][self.encode(state, [4,5,6,7])]
-        v += self.net[2][self.encode(state, [8,9,10,11])]
-        v += self.net[3][self.encode(state, [12,13,14,15])]
-        v += self.net[4][self.encode(state, [0,4,8,12])]
-        v += self.net[5][self.encode(state, [1,5,9,13])]
-        v += self.net[6][self.encode(state, [2,6,10,14])]
-        v += self.net[7][self.encode(state, [3,7,11,15])]
+        v += self.net[0][self.encode(state.state, [0,1,2,3])]
+        v += self.net[1][self.encode(state.state, [4,5,6,7])]
+        v += self.net[2][self.encode(state.state, [8,9,10,11])]
+        v += self.net[3][self.encode(state.state, [12,13,14,15])]
+        v += self.net[4][self.encode(state.state, [0,4,8,12])]
+        v += self.net[5][self.encode(state.state, [1,5,9,13])]
+        v += self.net[6][self.encode(state.state, [2,6,10,14])]
+        v += self.net[7][self.encode(state.state, [3,7,11,15])]
         return v        
 
     """ board state,  float target"""
-    def update(self):
-        return        
+    def update(self, state, target):
+        # print("in update")
+        # print(state)
+        error = target - self.evaluate(state)
+        delta = (self.alpha / 8) * error
+        self.net[0][self.encode(state.state, [0, 1, 2, 3])] += delta
+        self.net[1][self.encode(state.state, [4, 5, 6, 7])] += delta
+        self.net[2][self.encode(state.state, [8, 9, 10, 11])] += delta
+        self.net[3][self.encode(state.state, [12, 13, 14, 15])] += delta
+        self.net[4][self.encode(state.state, [0, 4, 8, 12])] += delta
+        self.net[5][self.encode(state.state, [1, 5, 9, 13])] += delta
+        self.net[6][self.encode(state.state, [2, 6, 10, 14])] += delta
+        self.net[7][self.encode(state.state, [3, 7, 11, 15])] += delta
+        return
+
+    """ board before """
+    def take_action(self, before):
+        best_value = -10000000
+        best_action = None
+        
+        for op in range(4):
+            after = board(before)
+            reward = after.slide(op)
+            if reward != -1:
+                v = reward + self.evaluate(after)
+                if v > best_value:
+                    best_value = v
+                    best_action = action.slide(op)
+        
+        if not self.first:
+            if best_value != -10000000:
+                self.update(self.last_state, best_value)
+            else:
+                self.update(self.last_state, 0)
+
+        self.last_state = before
+        self.last_state.slide(best_action)
+        self.last_value = self.evaluate(self.last_state)
+        self.first = False
+
+        if best_action == None:
+            return action()
+        else:
+            return best_action
 
 class rndenv(random_agent):
     """
@@ -243,17 +296,7 @@ class player(random_agent):
     def take_action(self, state):
         legal = [op for op in range(4) if board(state).slide(op) != -1]
         if legal:
-            """   Simple choice strategy ---> Prefer Up and Right  """
-            if 0 in legal:
-                if 1 in legal:
-                    op = self.choice([0,1])
-                else:
-                    op = 0
-            elif 1 in legal:
-                op = 1
-            else:
-                op = self.choice(legal)
-            # print("Player do: " + str(self.res[op]))
+            op = self.choice(legal)
 
             """ remember the current operation for current player doing """
             global operation
@@ -265,7 +308,7 @@ class player(random_agent):
     
     
 if __name__ == '__main__':
-    print('2048 Demo: agent.py\n')
+    print('Threes Demo: agent.py\n')
     
     state = board()
     env = rndenv()
