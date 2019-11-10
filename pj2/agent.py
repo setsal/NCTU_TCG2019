@@ -112,14 +112,7 @@ class weight_agent(agent):
         return
     
     def init_weights(self, info):
-        self.net += [weight(65536)]
-        self.net += [weight(65536)]
-        self.net += [weight(65536)]
-        self.net += [weight(65536)]
-        self.net += [weight(65536)]
-        self.net += [weight(65536)]
-        self.net += [weight(65536)]
-        self.net += [weight(65536)]
+        self.net = [weight(16777216)] * 32
         return
 
     def load_weights(self, path):
@@ -151,6 +144,16 @@ class learning_agent(weight_agent):
         self.last_state = None
         self.last_value = 0
         self.first = False
+        self.tuples = [
+                [ 0, 1, 2, 3, 4, 5 ],[ 3, 7, 11, 15, 2, 6 ],[ 15, 14, 13, 12, 11, 10 ],[ 12, 8, 4, 0, 13, 9 ],
+                [ 3, 2, 1, 0, 7, 6 ],[ 0, 4, 8, 12, 1, 5 ],[ 12, 13, 14, 15, 8, 9 ],[ 15, 11, 7, 3, 14, 10 ],
+                [ 4, 5, 6, 7, 8, 9 ],[ 2, 6, 10, 14, 1, 5 ],[ 11, 10, 9, 8, 7, 6 ],[ 13, 9, 5, 1, 14, 10 ],
+                [ 7, 6, 5, 4, 11, 10 ],[ 1, 5, 9, 13, 2, 6 ],[ 8, 9, 10, 11, 4, 5 ],[ 14, 10, 6, 2, 13, 9 ],
+                [ 0, 1, 2, 4, 5, 6 ],[ 3, 7, 11, 2, 6, 10 ],[ 15, 14, 13, 11, 10, 9 ],[ 12, 8, 4, 13, 9, 5 ],
+                [ 3, 2, 1, 7, 6, 5 ],[ 0, 4, 8, 1, 5, 9 ],[ 12, 13, 14, 8, 9, 10 ],[ 15, 11, 7, 14, 10, 6 ],
+                [ 4, 5, 6, 8, 9, 10 ],[ 2, 6, 10, 1, 5, 9 ],[ 11, 10, 9, 7, 6, 5 ], [ 13, 9, 5, 14, 10, 6 ], 
+                [ 7, 6, 5, 11, 10, 9 ], [ 1, 5, 9, 2, 6, 10 ], [ 8, 9, 10, 4, 5, 6 ], [ 14, 10, 6, 13, 9, 5 ]
+        ]
         alpha = self.property("alpha")
         if alpha is not None:
             self.alpha = float(alpha)
@@ -166,35 +169,21 @@ class learning_agent(weight_agent):
 
     """ calculate function """
     def encode(self, state, target):
-        return ( state[target[0]] << 0 ) | ( state[target[1]] << 4 ) | ( state[target[2]] << 8 ) | ( state[target[3]] << 12 )
+        return ( state[target[0]] << 0 ) | ( state[target[1]] << 4 ) | ( state[target[2]] << 8 ) | ( state[target[3]] << 12 ) | ( state[target[4]] << 16 ) | ( state[target[5]] << 20 )
 
     """ board state"""
     def evaluate(self, state):
         v = 0
-        v += self.net[0][self.encode(state.state, [0,1,2,3])]
-        v += self.net[1][self.encode(state.state, [4,5,6,7])]
-        v += self.net[2][self.encode(state.state, [8,9,10,11])]
-        v += self.net[3][self.encode(state.state, [12,13,14,15])]
-        v += self.net[4][self.encode(state.state, [0,4,8,12])]
-        v += self.net[5][self.encode(state.state, [1,5,9,13])]
-        v += self.net[6][self.encode(state.state, [2,6,10,14])]
-        v += self.net[7][self.encode(state.state, [3,7,11,15])]
+        for i in range(32):
+            v += self.net[i][self.encode(state.state, self.tuples[i])]
         return v        
 
     """ board state,  float target"""
     def update(self, state, target):
-        # print("in update")
-        # print(state)
         error = target - self.evaluate(state)
         delta = (self.alpha / 8) * error
-        self.net[0][self.encode(state.state, [0, 1, 2, 3])] += delta
-        self.net[1][self.encode(state.state, [4, 5, 6, 7])] += delta
-        self.net[2][self.encode(state.state, [8, 9, 10, 11])] += delta
-        self.net[3][self.encode(state.state, [12, 13, 14, 15])] += delta
-        self.net[4][self.encode(state.state, [0, 4, 8, 12])] += delta
-        self.net[5][self.encode(state.state, [1, 5, 9, 13])] += delta
-        self.net[6][self.encode(state.state, [2, 6, 10, 14])] += delta
-        self.net[7][self.encode(state.state, [3, 7, 11, 15])] += delta
+        for i in range(32):
+            self.net[i][self.encode(state.state, self.tuples[i])] += delta
         return
 
     """ board before """
