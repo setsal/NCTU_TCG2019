@@ -104,6 +104,7 @@ class weight_agent(agent):
         return
     
     def init_weights(self, info):
+        #self.net = [weight(65536)] * 8
         self.net = [weight(16777216)] * 32
         return
 
@@ -136,7 +137,7 @@ class learning_agent(weight_agent):
         self.last_state = None
         self.last_value = 0
         self.first = False
-        self.tuples = [
+        self.tuplesPos = [
                 [ 0, 1, 2, 3, 4, 5 ],[ 3, 7, 11, 15, 2, 6 ],[ 15, 14, 13, 12, 11, 10 ],[ 12, 8, 4, 0, 13, 9 ],
                 [ 3, 2, 1, 0, 7, 6 ],[ 0, 4, 8, 12, 1, 5 ],[ 12, 13, 14, 15, 8, 9 ],[ 15, 11, 7, 3, 14, 10 ],
                 [ 4, 5, 6, 7, 8, 9 ],[ 2, 6, 10, 14, 1, 5 ],[ 11, 10, 9, 8, 7, 6 ],[ 13, 9, 5, 1, 14, 10 ],
@@ -167,15 +168,14 @@ class learning_agent(weight_agent):
     def evaluate(self, state):
         v = 0
         for i in range(32):
-            v += self.net[i][self.encode(state.state, self.tuples[i])]
+            v += self.net[i][self.encode(state.state, self.tuplesPos[i])]
         return v        
 
     """ board state,  float target"""
     def update(self, state, target):
-        error = target - self.evaluate(state)
-        delta = (self.alpha / 32) * error
+        v = ( self.alpha / 32 ) * ( target - self.evaluate(state) )
         for i in range(32):
-            self.net[i][self.encode(state.state, self.tuples[i])] += delta
+            self.net[i][self.encode(state.state, self.tuplesPos[i])] += v
         return
 
     """ board before """
@@ -199,7 +199,6 @@ class learning_agent(weight_agent):
                 self.update(self.last_state, best_value)
             else:
                 self.update(self.last_state, 0)
-
 
         self.last_state = board(before)
         self.last_state.slide(operation)
