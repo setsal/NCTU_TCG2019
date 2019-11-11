@@ -119,32 +119,7 @@ action.prototype += [action.place]
 
 
 if __name__ == '__main__':
-    print('2048 Demo: action.py\n')
-    
-    state = board()
-    state[10] = 1
-    print(state)
-    
-    print(action.place.type)
-    p = action.place(10, 13)
-    print(p.code)
-    print(p.position())
-    print(p.tile())
-    p.apply(state)
-    print(state)
-    
-    print(action.slide.type)
-    s = action.slide(1)
-    print(s.code)
-    s.apply(state)
-    print(state)
-        
-    with open('X:/hello.txt', 'w') as f:
-#         pos = f.tell()
-#         print(f.read(2))
-#         f.seek(pos)
-#         print(f.read(2))
-        s.save(f)
-        p.save(f)
+    print('Threes Demo: action.py\n')
+    pass
         
     

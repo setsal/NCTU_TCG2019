@@ -40,6 +40,7 @@ class weight:
         size = size[0]
         value = array('f')
         value.fromfile(input, size)
-        self.value = list(value)
+        # self.value = list(value)
+        self.value = value[:]
         return True
     

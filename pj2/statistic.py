@@ -29,7 +29,7 @@ class statistic:
         self.limit = limit if limit else total
         self.data = []
         self.count = 0
-        self.threes_seq = [ 0, 1, 2, 3, 6, 12, 24, 48, 96, 192, 384, 768, 1536, 3072, 6144]
+        self.threes_seq = [ 0, 1, 2, 3, 6, 12, 24, 48, 96, 192, 384, 768, 1536, 3072, 6144 ]
         return
     
     def show(self, tstat = True):

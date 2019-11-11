@@ -11,7 +11,6 @@ from board import board
 from action import action
 from episode import episode
 from statistic import statistic
-from agent import player
 from agent import rndenv
 from agent import learning_agent
 import sys

@@ -72,25 +72,17 @@ class random_agent(agent):
         operation = -1
         if seed is not None:
             random.seed(int(seed))
-        # self.rstate = random.getstate()
         return
     
     def choice(self, seq):
-        # random.setstate(self.rstate)
         target = random.choice(seq)
-        # self.rstate = random.getstate()
         return target
     
     def shuffle(self, seq):
-        # random.setstate(self.rstate)
         random.shuffle(seq)
-        # self.rstate = random.getstate()
-        # if seed is not None:
-        #     random.seed(int(seed))
         return
     
     
-
 class weight_agent(agent):
     """ base agent for agents with weight tables """
     
@@ -181,14 +173,14 @@ class learning_agent(weight_agent):
     """ board state,  float target"""
     def update(self, state, target):
         error = target - self.evaluate(state)
-        delta = (self.alpha / 8) * error
+        delta = (self.alpha / 32) * error
         for i in range(32):
             self.net[i][self.encode(state.state, self.tuples[i])] += delta
         return
 
     """ board before """
     def take_action(self, before):
-        best_value = -10000000
+        best_value = -1000000
         best_action = None
         
         for op in range(4):
@@ -203,7 +195,7 @@ class learning_agent(weight_agent):
                     operation = op
         
         if not self.first:
-            if best_value != -10000000:
+            if best_value != -1000000:
                 self.update(self.last_state, best_value)
             else:
                 self.update(self.last_state, 0)
@@ -257,15 +249,11 @@ class rndenv(random_agent):
         
         if empty:
             pos = self.choice(empty)
-            # print("remain bag" + str(self.threes_bag ))
-
             """ Change to bag selection """
             if not self.threes_bag:
                 self.threes_bag = [1,2,3]
             tile = self.choice(self.threes_bag)
             self.threes_bag.remove(tile)
-            # print("Env put: " + str(tile) + ", in postion: " + str(pos))
-            
             return action.place(pos, tile)
         else:     
             return action()
@@ -303,46 +291,4 @@ class player(random_agent):
     
 if __name__ == '__main__':
     print('Threes Demo: agent.py\n')
-    
-    state = board()
-    env = rndenv()
-    ply = player()
-    
-    a = env.take_action(state)
-    r = a.apply(state)
-    print(a)
-    print(r)
-    print(state)
-        
-    a = env.take_action(state)
-    r = a.apply(state)
-    print(a)
-    print(r)
-    print(state)
-    
-    print(ply.take_action(state))
-    print(ply.take_action(state))
-    print(ply.take_action(state))
-    print(ply.take_action(state))
-    print(ply.take_action(state))
-    print(ply.take_action(state))
-    print(ply.take_action(state))
-    print(ply.take_action(state))
-    print(ply.take_action(state))
-    
-    state = board()
-    state[0] = 1
-    state[1] = 1
-    print(state)
-    
-    print(ply.take_action(state))
-    print(ply.take_action(state))
-    print(ply.take_action(state))
-    print(ply.take_action(state))
-    print(ply.take_action(state))
-    print(ply.take_action(state))
-    print(ply.take_action(state))
-    print(ply.take_action(state))
-    print(ply.take_action(state))
-    print(state)
-    
+    pass

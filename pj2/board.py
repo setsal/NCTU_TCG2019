@@ -172,16 +172,4 @@ class board:
     
 if __name__ == '__main__':
     print('Threes Demo: board.py\n')
-    
-    state = board()
-    state[0] = 2
-    state[1] = 4
-    state[2] = 2
-    state[3] = 1
-    # state[4] = 1
-    # state[5] = 1
-    # state[14] = 5
-    print(state)
-    state.slide_left()
-    # state[10] = 10
-    print(state)
+    pass
