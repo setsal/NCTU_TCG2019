@@ -173,7 +173,7 @@ class learning_agent(weight_agent):
 
     """ board state,  float target"""
     def update(self, state, target):
-        v = ( self.alpha / 32 ) * ( target - self.evaluate(state) )
+        v = ( self.alpha/32 ) * (target - self.evaluate(state))
         for i in range(32):
             self.net[i][self.encode(state.state, self.tuplesPos[i])] += v
         return
