@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+
+"""
+Framework for NoGo
+Modified from  setsal Lan (setsal) NoGo framework
+
+Author: setsal Lan (setsal)
+"""
+
 from __future__ import division
 
 import copy
@@ -21,7 +30,7 @@ def randomPolicy(state):
     return state.getReward(state.current_player)
 
 
-class treeNode():
+class treeNode:
     def __init__(self, state, parent):
         self.state = state
         self.isTerminal = state.isTerminal()
@@ -33,19 +42,24 @@ class treeNode():
 
 
 class mcts:
-    def __init__(self, timeLimit=None, iterationLimit=1000, explorationConstant=1 / math.sqrt(2),
-                 rolloutPolicy=randomPolicy, player=1):
+    def __init__(
+        self,
+        timeLimit=None,
+        iterationLimit=1000,
+        explorationConstant=1 / math.sqrt(2),
+        rolloutPolicy=randomPolicy,
+        player=1,
+    ):
         # set player
         self.player = player
+        self.limitType = "time"
         self.timeLimit = timeLimit
-        self.limitType = 'time'
-
         self.explorationConstant = explorationConstant
         self.rollout = rolloutPolicy
 
     def search(self, initialState):
         self.root = treeNode(initialState, None)
-        
+    
         timeLimit = time.time() + self.timeLimit / 1000
         while time.time() < timeLimit:
             self.executeRound()
@@ -71,10 +85,10 @@ class mcts:
     def expand(self, node):
         player = node.state.get_current_player()
         actions = node.state.getPossibleActions(player)
-        
+
         for action in actions:
             if action not in node.children:
-                newNode = treeNode(node.state.takeAction(action,player), node)
+                newNode = treeNode(node.state.takeAction(action, player), node)
                 node.children[action] = newNode
                 if len(actions) == len(node.children):
                     node.isFullyExpanded = True
@@ -92,8 +106,11 @@ class mcts:
         bestValue = float("-inf")
         bestNodes = []
         for child in node.children.values():
-            nodeValue = child.totalReward / child.numVisits + explorationValue * math.sqrt(
-                2 * math.log(node.numVisits) / child.numVisits)
+            nodeValue = (
+                child.totalReward / child.numVisits
+                + explorationValue
+                * math.sqrt(2 * math.log(node.numVisits) / child.numVisits)
+            )
             if nodeValue > bestValue:
                 bestValue = nodeValue
                 bestNodes = [child]
@@ -110,6 +127,8 @@ class mcts:
         move = self.search(initialState=board)
         return move
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # print('NoGO Demo: mcts.py\n')
-    pass 
+    pass
+

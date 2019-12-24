@@ -15,6 +15,10 @@ import sys
 
 
 def run():
+    time = 9000
+    for para in sys.argv[1:]:
+        if "--time=" in para:
+            time = int(para[(para.index("=") + 1):])
     try:
         """ Initial Board """
         myboard = board()
@@ -26,19 +30,20 @@ def run():
 
         myhuman = human(p1)
         # n in row, time, action
-        ai = mcts(timeLimit=1000, player=p2)
-        
+        ai = mcts(timeLimit=time, player=p2)
+
         signal = mygame.start(myhuman, ai)
         while signal != "END":
-                myboard.init_board()
-                p1, p2 = myboard.players
-                myhuman = human(p1)
-                ai = mcts(timeLimit=1000, player=p2)
-                signal = mygame.start(myhuman, ai)
+            myboard.init_board()
+            p1, p2 = myboard.players
+            myhuman = human(p1)
+            ai = mcts(timeLimit=time, player=p2)
+            signal = mygame.start(myhuman, ai)
 
     except KeyboardInterrupt:
-        print('\n\rquit')
+        print("STOP")
 
-if __name__ == '__main__':
-    # print('NoGo Demo: ' + " ".join(sys.argv))
+
+if __name__ == "__main__":
+    # print('NoGo Demo')
     run()
