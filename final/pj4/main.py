@@ -10,7 +10,7 @@ Author: setsal Lan (setsal)
 from board import board
 from game import game
 from mcts import mcts
-from human import human
+from enemy import enemy
 import sys
 
 
@@ -24,21 +24,25 @@ def run():
         myboard = board()
         mygame = game(myboard)
 
-        """ create human and AI """
+        """ create Enemy and AI """
         myboard.init_board()
         p1, p2 = myboard.players
 
-        myhuman = human(p1)
-        # n in row, time, action
-        ai = mcts(timeLimit=time, player=p2)
+        """ First Round  """
+        myEnemy = enemy(player=p1)
+        myAi = mcts(timeLimit=time, player=p2)
+        signal = mygame.start(myEnemy, myAi)
 
-        signal = mygame.start(myhuman, ai)
-        while signal != "END":
-            myboard.init_board()
-            p1, p2 = myboard.players
-            myhuman = human(p1)
-            ai = mcts(timeLimit=time, player=p2)
-            signal = mygame.start(myhuman, ai)
+        while(True):
+            if  signal == "CLEAN":
+                """ New Round """
+                myboard.init_board()
+                p1, p2 = myboard.players    #1, 2
+                myEnemy = enemy(player=p1)
+                myAi = mcts(timeLimit=time, player=p2)
+                signal = mygame.start(myEnemy, myAi)
+            elif signal == "END":
+                break
 
     except KeyboardInterrupt:
         print("STOP")

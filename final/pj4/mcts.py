@@ -45,16 +45,15 @@ class mcts:
     def __init__(
         self,
         timeLimit=None,
-        iterationLimit=1000,
         explorationConstant=1 / math.sqrt(2),
         rolloutPolicy=randomPolicy,
-        player=1,
+        player=2
     ):
         # set player
         self.player = player
         self.limitType = "time"
         self.timeLimit = timeLimit
-        self.explorationConstant = explorationConstant
+        self.explorationConstant = 1 / math.sqrt(2)
         self.rollout = rolloutPolicy
 
     def search(self, initialState):
@@ -71,7 +70,6 @@ class mcts:
     def executeRound(self):
         node = self.selectNode(self.root)
         reward = self.rollout(node.state)
-        # print("Get reward" + str(reward))
         self.backpropogate(node, reward)
 
     def selectNode(self, node):
@@ -129,6 +127,5 @@ class mcts:
 
 
 if __name__ == "__main__":
-    # print('NoGO Demo: mcts.py\n')
     pass
 

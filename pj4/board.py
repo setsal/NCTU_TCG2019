@@ -23,7 +23,7 @@ class board:
         self.players = [1, 2]  # player1 and player2
 
     def init_board(self):
-        self.current_player = self.players[0]  # start player
+        self.current_player = self.players[1]  # start player
         self.availables = {}
         for player in self.players:
             self.availables[player] = list(range(self.width * self.width))
@@ -52,11 +52,12 @@ class board:
         return self.availables[player]
 
     def is_movable(self, move, player):
-        if move in self.states:
+        if move in self.states: # 已經被下
+            print('??? 已經被下 ???')
             return False
-        if move >= self.width * self.width:
+        if move >= self.width * self.width:  #超過範圍
             return False
-        if move < 0:
+        if move < 0: 
             return False
 
         # do not lock other player
@@ -76,6 +77,7 @@ class board:
         visited = [0] * (self.width * self.width)
         visited[move] = 1
 
+        # 下後還有空位處理
         for adj_move in self.adjacent_moves(move):
             if adj_move in self.states and self.states[adj_move] == player:
                 if self.has_vacancy(adj_move, visited):
