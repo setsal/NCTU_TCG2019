@@ -9,6 +9,7 @@ Author: setsal Lan (setsal)
 from __future__ import print_function
 import sys
 from mcts import mcts
+import random
 import gogtp
 
 def eprint(*args, **kwargs):
@@ -21,10 +22,13 @@ class game:
 
     def __init__(self, board):
         self.board = board
+        self.time = 0
 
     def start(self, player1, player2):
         p1, p2 = self.board.players   #get 1, 2
         players = {}
+        black = [  38, 30, 40, 32, 42, 34, 44, 54, 46, 56, 48, 58, 50, 60, 52, 62, 72, 64, 74, 66, 76, 68, 78, 70, 80 ]
+        # random.shuffle(black)
 
         """ 設定角色 """
         players[p1] = player1    # Enemy
@@ -33,6 +37,7 @@ class game:
         # self.graphic(self.board, player1, player2)
         # print('------- Game Start ---------')
         while True:
+            self.time = self.time + 1
             gogtp_input = input()
             motion = gogtp.negotiate(gogtp_input)
 
@@ -49,13 +54,36 @@ class game:
                     break
 
                 """ AI Move """
-                move = players[p2].get_action(self.board)
-                res = self.board.move_to_location(move)
-                if res[1] == 9: res[1] = res[1]+1 # FOR GTP..
-                print("=" + chr(res[1] + ord('A')) + chr(res[0] + ord('1')))
-                print("")
-                self.board.current_player = 2 # AI Current Play
-                self.board.update(move)
+
+                """ add a little trick """
+                if len(black) != 0:
+                    move = black.pop()
+                    eprint("[*] black move!?" + str(move) )
+                    if move in self.board.availables[2]:
+                        res = self.board.move_to_location(move)
+                        if res[1] == 8: res[1] = res[1]+1 # FOR GTP..
+                        print("=" + chr(res[1] + ord('A')) + chr(res[0] + ord('1')))
+                        print("")                        
+                        self.board.current_player = 2 # AI Current Play
+                        self.board.update(move)
+                    else:
+                        move = players[p2].get_action(self.board)
+                        eprint("[*] move!?" + str(move) )
+                        res = self.board.move_to_location(move)
+                        if res[1] == 8: res[1] = res[1]+1 # FOR GTP..
+                        print("=" + chr(res[1] + ord('A')) + chr(res[0] + ord('1')))
+                        print("")
+                        self.board.current_player = 2 # AI Current Play
+                        self.board.update(move)
+                else:
+                        move = players[p2].get_action(self.board)
+                        eprint("[*] move!?" + str(move) )
+                        res = self.board.move_to_location(move)
+                        if res[1] == 8: res[1] = res[1]+1 # FOR GTP..
+                        print("=" + chr(res[1] + ord('A')) + chr(res[0] + ord('1')))
+                        print("")
+                        self.board.current_player = 2 # AI Current Play
+                        self.board.update(move)                    
                 # self.graphic(self.board, player1, player2)
 
             elif motion.startswith("enemy:"):
